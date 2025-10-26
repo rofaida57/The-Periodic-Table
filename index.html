@@ -70,6 +70,35 @@
             outline: none;
         }
 
+        .tabs-container {
+            margin-bottom: 30px;
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--dark-color);
+            border: none;
+            border-bottom: 3px solid transparent;
+            border-radius: 0;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            color: var(--primary-color);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background-color: transparent;
+            border-color: var(--primary-color);
+        }
+
         .element-card {
             background-color: white;
             border-radius: 10px;
@@ -178,6 +207,20 @@
         .category-lanthanide { background-color: #8d6e63; color: white; }
         .category-actinide { background-color: #78909c; color: white; }
 
+        .compound-category {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .category-organic { background-color: #4caf50; color: white; }
+        .category-inorganic { background-color: #2196f3; color: white; }
+        .category-biochemical { background-color: #9c27b0; color: white; }
+        .category-industrial { background-color: #ff9800; color: white; }
+
         .loading-spinner {
             display: flex;
             justify-content: center;
@@ -196,9 +239,30 @@
             color: #6c757d;
         }
 
+        .compound-formula {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 5px 0;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
         @media (max-width: 768px) {
             .filter-buttons {
                 justify-content: center;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 8px 12px;
+                font-size: 14px;
             }
         }
     </style>
@@ -206,41 +270,207 @@
 <body>
     <div class="header">
         <div class="container">
-            <h1 class="text-center mb-0">الجدول الدوري للعناصر الكيميائية</h1>
-            <p class="text-center mb-0">ابحث عن العناصر الكيميائية بالاسم أو الرمز</p>
+            <h1 class="text-center mb-0">الجدول الدوري للعناصر والمركبات الكيميائية</h1>
+            <p class="text-center mb-0">مرجع شامل لطلاب الكيمياء في الجزائر</p>
         </div>
     </div>
 
     <div class="container">
         <div class="search-container">
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن عنصر بالاسم أو الرمز...">
+                <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن عنصر أو مركب كيميائي...">
                 <i class="bi bi-search search-icon" id="searchIcon"></i>
             </div>
-            
-            <div class="filter-buttons mt-3" id="filterButtons">
-                <button class="filter-btn active" data-category="all">الكل</button>
-                <button class="filter-btn" data-category="alkali">فلزات قلوية</button>
-                <button class="filter-btn" data-category="alkaline">فلزات قلوية ترابية</button>
-                <button class="filter-btn" data-category="transition">فلزات انتقالية</button>
-                <button class="filter-btn" data-category="post-transition">فلزات ما بعد انتقالية</button>
-                <button class="filter-btn" data-category="metalloid">شبه فلزات</button>
-                <button class="filter-btn" data-category="nonmetal">لا فلزات</button>
-                <button class="filter-btn" data-category="halogen">هالوجينات</button>
-                <button class="filter-btn" data-category="noble">غازات نبيلة</button>
-                <button class="filter-btn" data-category="lanthanide">لانثانيدات</button>
-                <button class="filter-btn" data-category="actinide">أكتينيدات</button>
+        </div>
+
+        <div class="tabs-container">
+            <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="elements-tab" data-bs-toggle="tab" data-bs-target="#elements" type="button" role="tab" aria-controls="elements" aria-selected="true">العناصر الكيميائية</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="compounds-tab" data-bs-toggle="tab" data-bs-target="#compounds" type="button" role="tab" aria-controls="compounds" aria-selected="false">المركبات الكيميائية</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="algerian-tab" data-bs-toggle="tab" data-bs-target="#algerian" type="button" role="tab" aria-controls="algerian" aria-selected="false">مناهج الجزائر</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="mainTabsContent">
+                <div class="tab-pane fade show active" id="elements" role="tabpanel" aria-labelledby="elements-tab">
+                    <div class="filter-buttons mt-3" id="elementFilterButtons">
+                        <button class="filter-btn active" data-category="all">الكل</button>
+                        <button class="filter-btn" data-category="alkali">فلزات قلوية</button>
+                        <button class="filter-btn" data-category="alkaline">فلزات قلوية ترابية</button>
+                        <button class="filter-btn" data-category="transition">فلزات انتقالية</button>
+                        <button class="filter-btn" data-category="post-transition">فلزات ما بعد انتقالية</button>
+                        <button class="filter-btn" data-category="metalloid">شبه فلزات</button>
+                        <button class="filter-btn" data-category="nonmetal">لا فلزات</button>
+                        <button class="filter-btn" data-category="halogen">هالوجينات</button>
+                        <button class="filter-btn" data-category="noble">غازات نبيلة</button>
+                        <button class="filter-btn" data-category="lanthanide">لانثانيدات</button>
+                        <button class="filter-btn" data-category="actinide">أكتينيدات</button>
+                    </div>
+                    <div id="elementsContainer" class="row">
+                        <!-- سيتم عرض العناصر هنا -->
+                    </div>
+                    <div id="noElementsResults" class="no-results" style="display: none;">
+                        <i class="bi bi-search" style="font-size: 48px;"></i>
+                        <h3>لا توجد نتائج</h3>
+                        <p>يرجى البحث بكلمة أخرى أو محاولة استخدام مرشحات مختلفة</p>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="compounds" role="tabpanel" aria-labelledby="compounds-tab">
+                    <div class="filter-buttons mt-3" id="compoundFilterButtons">
+                        <button class="filter-btn active" data-category="all">الكل</button>
+                        <button class="filter-btn" data-category="organic">مركبات عضوية</button>
+                        <button class="filter-btn" data-category="inorganic">مركبات غير عضوية</button>
+                        <button class="filter-btn" data-category="biochemical">مركبات كيميائية حيوية</button>
+                        <button class="filter-btn" data-category="industrial">مركبات صناعية</button>
+                    </div>
+                    <div id="compoundsContainer" class="row">
+                        <!-- سيتم عرض المركبات هنا -->
+                    </div>
+                    <div id="noCompoundsResults" class="no-results" style="display: none;">
+                        <i class="bi bi-search" style="font-size: 48px;"></i>
+                        <h3>لا توجد نتائج</h3>
+                        <p>يرجى البحث بكلمة أخرى أو محاولة استخدام مرشحات مختلفة</p>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="algerian" role="tabpanel" aria-labelledby="algerian-tab">
+                    <div class="mt-4">
+                        <h2 class="section-title">العناصر والمركبات الهامة في المناهج الجزائرية</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="section-title">المرحلة الثانوية</h3>
+                                <div class="accordion" id="secondaryAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                السنة الأولى ثانوي علوم وتكنولوجيا
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#secondaryAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item">الهيدروجين (H) والأكسجين (O) والماء (H<sub>2</sub>O)</li>
+                                                    <li class="list-group-item">الكربون (C) ومركباته: ثاني أكسيد الكربون (CO<sub>2</sub>)، الميثان (CH<sub>4</sub>)</li>
+                                                    <li class="list-group-item">النيتروجين (N) والأمونيا (NH<sub>3</sub>)</li>
+                                                    <li class="list-group-item">الكبريت (S) وثاني أكسيد الكبريت (SO<sub>2</sub>)</li>
+                                                    <li class="list-group-item">الكلور (Cl) وكلوريد الصوديوم (NaCl)</li>
+                                                    <li class="list-group-item">الأحماض والقواعد: حمض الهيدروكلوريك (HCl)، هيدروكسيد الصوديوم (NaOH)</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                السنة الثانية ثانوي علوم وتكنولوجيا
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#secondaryAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item">الهيدروكربونات: الألكانات، الألكينات، الألكاينات</li>
+                                                    <li class="list-group-item">الكحولات: الميثانول، الإيثانول</li>
+                                                    <li class="list-group-item">الأحماض الكربوكسيلية: حمض الخليك (CH<sub>3</sub>COOH)</li>
+                                                    <li class="list-group-item">الإسترات: خلات الإيثيل</li>
+                                                    <li class="list-group-item">البوليمرات: البولي إيثيلين، البولي فينيل كلوريد (PVC)</li>
+                                                    <li class="list-group-item">المعادن الفلزية: الحديد، الألومنيوم، النحاس</li>
+                                                    <li class="list-group-item">سبائك المعادن: الفولاذ، البرونز</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingThree">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                السنة الثالثة ثانوي علوم تجريبية
+                                            </button>
+                                        </h2>
+                                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#secondaryAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item">التوازن الكيميائي وثابت التوازن</li>
+                                                    <li class="list-group-item">محاليل الإلكتروليتية ودرجة الحموضة (pH)</li>
+                                                    <li class="list-group-item">التفاعلات الكيميائية الحفازة</li>
+                                                    <li class="list-group-item">الكيمياء الكهربائية: الأقطاب، الخلايا الجلفانية</li>
+                                                    <li class="list-group-item">المركبات العضوية الأروماتية: البنزين ومشتقاته</li>
+                                                    <li class="list-group-item">المركبات العضوية ذات الوظائف المتعددة</li>
+                                                    <li class="list-group-item">التفاعلات العضوية الرئيسية: استبدال، إضافة، حذف</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="section-title">المرحلة الجامعية</h3>
+                                <div class="accordion" id="universityAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingFour">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                                السنة الأولى جامعي (كيمياء)
+                                            </button>
+                                        </h2>
+                                        <div id="collapseFour" class="accordion-collapse collapse show" aria-labelledby="headingFour" data-bs-parent="#universityAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="list-group">
+                                                    <li class="list-group-item">البنية الذرية والجدول الدوري</li>
+                                                    <li class="list-group-item">الروابط الكيميائية: تساهمية، أيونية، فلزية</li>
+                                                    <li class="list-group-item">الكيمياء الحرارية: الأنتالبي، الأنتروبي، طاقة جيبس الحرة</li>
+                                                    <li class="list-group-item">الكيمياء الحركية: سرعة التفاعلات، العوامل المؤثرة</li>
+                                                    <li class="list-group-item">الكيمياء العضوية: تصنيف المركبات، التسمية، التفاعلات</li>
+                                                    <li class="list-group-item">الكيمياء التحليلية: طرق التحليل النوعي والكمي</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingFive">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                                السنة الثانية والثالثة جامعي (تخصصات الكيمياء)
+                                            </button>
+                                        </h2>
+                                        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#universityAccordion">
+                                            <div class="accordion-body">
+                                                <h5>الكيمياء العضوية:</h5>
+                                                <ul class="list-group mb-3">
+                                                    <li class="list-group-item">الكيمياء العضوية المتقدمة: مركبات حلقة غير متجانسة</li>
+                                                    <li class="list-group-item">الكيمياء العضوية الفلزية</li>
+                                                    <li class="list-group-item">التخليق العضوي واستراتيجياته</li>
+                                                    <li class="list-group-item">المطيافية العضوية: IR، NMR، MS</li>
+                                                </ul>
+                                                <h5>الكيمياء غير العضوية:</h5>
+                                                <ul class="list-group mb-3">
+                                                    <li class="list-group-item">كيمياء المعادن الانتقالية</li>
+                                                    <li class="list-group-item">الكيمياء التناسقية والمركبات التناسقية</li>
+                                                    <li class="list-group-item">كيمياء المجموعات الرئيسية</li>
+                                                    <li class="list-group-item">الكيمياء الصلبة والمواد</li>
+                                                </ul>
+                                                <h5>الكيمياء التحليلية:</h5>
+                                                <ul class="list-group mb-3">
+                                                    <li class="list-group-item">الطرق الطيفية التحليلية</li>
+                                                    <li class="list-group-item">الكروماتوغرافيا وتقنيات الفصل</li>
+                                                    <li class="list-group-item">التحليل الكهروكيميائي</li>
+                                                    <li class="list-group-item">التحليل الآلي والأجهزة</li>
+                                                </ul>
+                                                <h5>الكيمياء الفيزيائية:</h5>
+                                                <ul class="list-group">
+                                                    <li class="list-group-item">ميكانيكا الكم والكيمياء الكمية</li>
+                                                    <li class="list-group-item">الديناميكا الحرارية الكيميائية المتقدمة</li>
+                                                    <li class="list-group-item">حركية التفاعلات المعقدة</li>
+                                                    <li class="list-group-item">كيمياء السطوح والمحاليل الغروية</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div id="elementsContainer" class="row">
-            <!-- سيتم عرض العناصر هنا -->
-        </div>
-
-        <div id="noResults" class="no-results" style="display: none;">
-            <i class="bi bi-search" style="font-size: 48px;"></i>
-            <h3>لا توجد نتائج</h3>
-            <p>يرجى البحث بكلمة أخرى أو محاولة استخدام مرشحات مختلفة</p>
         </div>
     </div>
 
@@ -285,6 +515,47 @@
         </div>
     </div>
 
+    <!-- Modal لعرض تفاصيل المركب -->
+    <div class="modal fade" id="compoundModal" tabindex="-1" aria-labelledby="compoundModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="compoundModalLabel">تفاصيل المركب</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div id="modalCompoundImageContainer">
+                                <div class="loading-spinner">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">جاري التحميل...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 element-details">
+                            <h3 id="modalCompoundName"></h3>
+                            <div class="compound-formula" id="modalCompoundFormula"></div>
+                            <p><strong>النوع:</strong> <span id="modalCompoundType"></span></p>
+                            <p><strong>الكتلة المولية:</strong> <span id="modalCompoundMolarMass"></span> g/mol</p>
+                            <p><strong>درجة الانصهار:</strong> <span id="modalCompoundMelting"></span></p>
+                            <p><strong>درجة الغليان:</strong> <span id="modalCompoundBoiling"></span></p>
+                            <p><strong>الكثافة:</strong> <span id="modalCompoundDensity"></span></p>
+                            <p><strong>الذوبانية:</strong> <span id="modalCompoundSolubility"></span></p>
+                            <p id="modalCompoundDescription"></p>
+                            <h5>الاستخدامات:</h5>
+                            <ul id="modalCompoundUses"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // بيانات العناصر الكيميائية
@@ -313,7 +584,7 @@
             { number: 22, symbol: 'Ti', name: 'تيتانيوم', category: 'transition', weight: '47.87', group: '4', period: '4', melting: '1668', boiling: '3287', density: '4.506', description: 'التيتانيوم هو فلز انتقالي قوي وخفيف الوزن. وهو مقاوم للتآكل ويستخدم في صناعة الطائرات وزراعة الأسنان.' },
             { number: 23, symbol: 'V', name: 'فاناديوم', category: 'transition', weight: '50.94', group: '5', period: '4', melting: '1910', boiling: '3407', density: '6.11', description: 'الفاناديوم هو فلز انتقالي صلب رمادي أزرق. يستخدم في صناعة الفولاذ وفي البطاريات.' },
             { number: 24, symbol: 'Cr', name: 'كروم', category: 'transition', weight: '52.00', group: '6', period: '4', melting: '1907', boiling: '2671', density: '7.19', description: 'الكروم هو فلز انتقالي صلب لامع. يستخدم في طلاء المعادن لمنع الصدأ وفي صناعة الفولاذ المقاوم للصدأ.' },
-            { number: 25, symbol: 'Mn', name: 'منغنيز', category: 'transition', weight: '54.94', group: '7', period: '4', melting: '1246', boiling: '2061', density: '7.21', description: 'المنغنيز هو فلز انتقالي صلب هش. يستخدم في صناعة الفولاذ وفي البطاريات.' },
+            { number: 25, symbol: 'Mn', name: 'منغنيز', category: 'transition', weight: '54.94', group: '7', period: '4', melting: '1246', boiling: '2061', density: '7.21', description: 'المنغنيوم هو فلز انتقالي صلب هش. يستخدم في صناعة الفولاذ وفي البطاريات.' },
             { number: 26, symbol: 'Fe', name: 'حديد', category: 'transition', weight: '55.85', group: '8', period: '4', melting: '1538', boiling: '2861', density: '7.874', description: 'الحديد هو فلز انتقالي صلب رمادي اللون. وهو أكثر الفلزات استخداماً في العالم ويستخدم في صناعة الصلب والبناء.' },
             { number: 27, symbol: 'Co', name: 'كوبالت', category: 'transition', weight: '58.93', group: '9', period: '4', melting: '1495', boiling: '2927', density: '8.86', description: 'الكوبالت هو فلز انتقالي صلب فضي مزرق. يستخدم في صناعة المغناطيس القوي وفي البطاريات.' },
             { number: 28, symbol: 'Ni', name: 'نيكل', category: 'transition', weight: '58.69', group: '10', period: '4', melting: '1455', boiling: '2913', density: '8.908', description: 'النيكل هو فلز انتقالي صلب فضي اللون. يستخدم في صناعة الفولاذ المقاوم للصدأ وفي العملات المعدنية.' },
@@ -409,10 +680,274 @@
             { number: 118, symbol: 'Og', name: 'أوغانيسون', category: 'noble', weight: '294', group: '18', period: '7', melting: '0', boiling: '0', density: '0', description: 'الأوغانيسون هو غاز نبيل مشع صناعي. يستخدم في الأبحاث العلمية.' }
         ];
 
+        // بيانات المركبات الكيميائية الهامة في المناهج الجزائرية
+        const compounds = [
+            {
+                id: 1,
+                name: 'ماء',
+                formula: 'H<sub>2</sub>O',
+                category: 'inorganic',
+                molarMass: '18.015',
+                melting: '0',
+                boiling: '100',
+                density: '1.000',
+                solubility: 'قابل للامتزاج مع العديد من المذيبات',
+                description: 'الماء هو مركب كيميائي من جزيئين من الهيدروجين وذرة واحدة من الأكسجين. يعتبر الماء أساس الحياة على الأرض ومذيب عالمي للعديد من المواد.',
+                uses: ['شرب', 'ري الزراعة', 'تنظيف', 'تبريد', 'مذيب في التفاعلات الكيميائية', 'إنتاج الطاقة الكهرومائية']
+            },
+            {
+                id: 2,
+                name: 'ثاني أكسيد الكربون',
+                formula: 'CO<sub>2</sub>',
+                category: 'inorganic',
+                molarMass: '44.01',
+                melting: '-78.5',
+                boiling: '-57',
+                density: '1.977',
+                solubility: 'ذوبانية معتدلة في الماء',
+                description: 'ثاني أكسيد الكربون هو غاز عديم اللون والرائحة يتكون من ذرة كربون وذرتين من الأكسجين. ينتج عن التنفس والاحتراق والعمليات الصناعية.',
+                uses: ['المشروبات الغازية', 'إطفاء الحرائق', 'التبريد', 'في الزراعة (الصوبات الزراعية)', 'في صناعة البلاستيك']
+            },
+            {
+                id: 3,
+                name: 'الميثان',
+                formula: 'CH<sub>4</sub>',
+                category: 'organic',
+                molarMass: '16.04',
+                melting: '-182.5',
+                boiling: '-161.5',
+                density: '0.717',
+                solubility: 'ذوبانية منخفضة في الماء',
+                description: 'الميثان هو أبسط الهيدروكربونات وأول مركب في سلسلة الألكانات. هو غاز عديم اللون والرائحة وقابل للاشتعال.',
+                uses: ['وقود', 'في صناعة الهيدروجين', 'في صناعة الميثانول', 'في صناعة الأسمدة', 'في توليد الكهرباء']
+            },
+            {
+                id: 4,
+                name: 'الأمونيا',
+                formula: 'NH<sub>3</sub>',
+                category: 'inorganic',
+                molarMass: '17.03',
+                melting: '-77.7',
+                boiling: '-33.3',
+                density: '0.73',
+                solubility: 'ذوبانية عالية جداً في الماء',
+                description: 'الأمونيا هي مركب كيميائي من النيتروجين والهيدروجين. هي غاز عديم اللون ذات رائحة نفاذة ومهيجة.',
+                uses: ['صناعة الأسمدة', 'في صناعة المنظفات', 'في تبريد', 'في صناعة المتفجرات', 'في تنقية المياه']
+            },
+            {
+                id: 5,
+                name: 'حمض الهيدروكلوريك',
+                formula: 'HCl',
+                category: 'inorganic',
+                molarMass: '36.46',
+                melting: '-30',
+                boiling: '85',
+                density: '1.18',
+                solubility: 'ذوبانية عالية جداً في الماء',
+                description: 'حمض الهيدروكلوريك هو محاليل مائية لغاز كلوريد الهيدروجين. هو حمض قوي ويستخدم على نطاق واسع في الصناعة.',
+                uses: ['تنظيف المعادن', 'في صناعة البلاستيك', 'في صناعة الأدوية', 'في تعدين الذهب', 'في معالجة الجلود']
+            },
+            {
+                id: 6,
+                name: 'هيدروكسيد الصوديوم',
+                formula: 'NaOH',
+                category: 'inorganic',
+                molarMass: '40.00',
+                melting: '318',
+                boiling: '1388',
+                density: '2.13',
+                solubility: 'ذوبانية عالية جداً في الماء',
+                description: 'هيدروكسيد الصوديوم (الصودا الكاوية) هو قاعدة قوية تستخدم على نطاق واسع في الصناعة. هو مادة صلبة بيضاء قابلة للذوبان في الماء.',
+                uses: ['صناعة الصابون والمنظفات', 'في صناعة الورق', 'في صناعة النسيج', 'في تنقية البترول', 'في صناعة الألومنيوم']
+            },
+            {
+                id: 7,
+                name: 'حمض الكبريتيك',
+                formula: 'H<sub>2</sub>SO<sub>4</sub>',
+                category: 'inorganic',
+                molarMass: '98.08',
+                melting: '10',
+                boiling: '337',
+                density: '1.84',
+                solubility: 'ذوبانية عالية جداً في الماء',
+                description: 'حمض الكبريتيك هو حمض معدني قوي يستخدم على نطاق واسع في الصناعة. هو سائل زيتي عديم اللون عند درجة الحرارة العادية.',
+                uses: ['صناعة الأسمدة', 'في صناعة البطاريات', 'في تكرير البترول', 'في صناعة الأصباغ', 'في معالجة المعادن']
+            },
+            {
+                id: 8,
+                name: 'كلوريد الصوديوم',
+                formula: 'NaCl',
+                category: 'inorganic',
+                molarMass: '58.44',
+                melting: '801',
+                boiling: '1413',
+                density: '2.16',
+                solubility: 'ذوبانية عالية في الماء',
+                description: 'كلوريد الصوديوم (ملح الطعام) هو مركب أيوني يتكون من أيونات الصوديوم والكلوريد. هو ضروري للحياة ويستخدم على نطاق واسع.',
+                uses: ['توابل الطعام', 'حفظ الأطعمة', 'في صناعة المواد الكيميائية', 'إزالة الجليد من الطرق', 'في صناعة البلاستيك']
+            },
+            {
+                id: 9,
+                name: 'الإيثانول',
+                formula: 'C<sub>2</sub>H<sub>5</sub>OH',
+                category: 'organic',
+                molarMass: '46.07',
+                melting: '-114',
+                boiling: '78',
+                density: '0.789',
+                solubility: 'قابل للامتزاج مع الماء',
+                description: 'الإيثانول (الكحول الإيثيلي) هو كحول عديم اللون وقابل للاشتعال. هو المكون النشط في المشروبات الكحولية ويستخدم كوقود ومذيب.',
+                uses: ['وقود', 'مذيب', 'مشروبات كحولية', 'مطهر', 'في صناعة العطور', 'في صناعة الأدوية']
+            },
+            {
+                id: 10,
+                name: 'حمض الخليك',
+                formula: 'CH<sub>3</sub>COOH',
+                category: 'organic',
+                molarMass: '60.05',
+                melting: '16.6',
+                boiling: '118',
+                density: '1.05',
+                solubility: 'قابل للامتزاج مع الماء',
+                description: 'حمض الخليك هو حمض عضوي ضعيف يعطي الخل طعمه الحامض ورائحته المميزة. هو سائل عديم اللون عند درجة الحرارة العادية.',
+                uses: ['في الخل', 'كمادة حافظة', 'في صناعة البلاستيك', 'في صناعة الألياف', 'في صناعة الأدوية']
+            },
+            {
+                id: 11,
+                name: 'الجلوكوز',
+                formula: 'C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>',
+                category: 'biochemical',
+                molarMass: '180.16',
+                melting: '146',
+                boiling: 'يتحلل قبل الغليان',
+                density: '1.54',
+                solubility: 'ذوبانية عالية في الماء',
+                description: 'الجلوكوز هو سكر بسيط وأهم مصدر للطاقة في الكائنات الحية. هو منتج رئيسي لعملية التمثيل الضوئي ويستخدم في التنفس الخلوي.',
+                uses: ['مصدر طاقة للجسم', 'في صناعة الأغذية', 'في صناعة الأدوية', 'في صناعة المواد البلاستيكية القابلة للتحلل', 'في الطب']
+            },
+            {
+                id: 12,
+                name: 'البولي إيثيلين',
+                formula: '(C<sub>2</sub>H<sub>4</sub>)<sub>n</sub>',
+                category: 'industrial',
+                molarMass: 'متغير',
+                melting: '120-130',
+                boiling: 'يتحلل قبل الغليان',
+                density: '0.91-0.97',
+                solubility: 'غير قابل للذوبان في الماء',
+                description: 'البولي إيثيلين هو بوليمر شائع يستخدم في العديد من التطبيقات. هو مادة بلاستيكية شفافة أو شبه شفافة مرنة.',
+                uses: ['الأكياس البلاستيكية', 'الزجاجات', 'الألعاب', 'الأغلفة', 'الأنابيب', 'العوازل الكهربائية']
+            },
+            {
+                id: 13,
+                name: 'البنزين',
+                formula: 'C<sub>6</sub>H<sub>6</sub>',
+                category: 'organic',
+                molarMass: '78.11',
+                melting: '5.5',
+                boiling: '80',
+                density: '0.879',
+                solubility: 'ذوبانية منخفضة في الماء',
+                description: 'البنزين هو مركب عضوي أروماتي عديم اللون وسائل قابل للاشتعال. له رائحة حلوة مميزة وهو مذيب عضوي مهم.',
+                uses: ['مذيب', 'وقود', 'في صناعة البلاستيك', 'في صناعة المطاط', 'في صناعة الأصباغ', 'في صناعة الأدوية']
+            },
+            {
+                id: 14,
+                name: 'الأسبرين',
+                formula: 'C<sub>9</sub>H<sub>8</sub>O<sub>4</sub>',
+                category: 'biochemical',
+                molarMass: '180.16',
+                melting: '135',
+                boiling: '140',
+                density: '1.40',
+                solubility: 'ذوبانية منخفضة في الماء',
+                description: 'الأسبرين (حمض أسيتيل الساليسيليك) هو دواء يستخدم لتخفيف الألم وخفض الحرارة ومضاد للالتهابات. هو من أكثر الأدوية استخداماً في العالم.',
+                uses: ['مسكن للألم', 'خافض للحرارة', 'مضاد للالتهابات', 'للوقاية من النوبات القلبية', 'للوقاية من السكتات الدماغية']
+            },
+            {
+                id: 15,
+                name: 'ثاني أكسيد التيتانيوم',
+                formula: 'TiO<sub>2</sub>',
+                category: 'inorganic',
+                molarMass: '79.87',
+                melting: '1843',
+                boiling: '2972',
+                density: '4.23',
+                solubility: 'غير قابل للذوبان في الماء',
+                description: 'ثاني أكسيد التيتانيوم هو أكسيد التيتانيوم الطبيعي. هو مسحوق أبيض يستخدم على نطاق واسع في الطلاء والمنتجات الأخرى.',
+                uses: ['صباغ أبيض', 'واقي من الشمس', 'في طلاء المعادن', 'في صناعة الورق', 'في صناعة البلاستيك', 'في صناعة الأغذية']
+            },
+            {
+                id: 16,
+                name: 'اليوريا',
+                formula: 'CO(NH<sub>2</sub>)<sub>2</sub>',
+                category: 'inorganic',
+                molarMass: '60.06',
+                melting: '133',
+                boiling: 'يتحلل قبل الغليان',
+                density: '1.32',
+                solubility: 'ذوبانية عالية في الماء',
+                description: 'اليوريا هي مركب عضوي صلب بلوري أبيض. هي تحتوي على نسبة عالية من النيتروجين وتستخدم أساساً كسماد.',
+                uses: ['سماد', 'في صناعة البلاستيك', 'في صناعة المواد اللاصقة', 'في صناعة المستحضرات الصيدلانية', 'في صناعة مستحضرات التجميل']
+            },
+            {
+                id: 17,
+                name: 'الجلسرين',
+                formula: 'C<sub>3</sub>H<sub>8</sub>O<sub>3</sub>',
+                category: 'biochemical',
+                molarMass: '92.09',
+                melting: '18',
+                boiling: '290',
+                density: '1.26',
+                solubility: 'قابل للامتزاج مع الماء',
+                description: 'الجلسرين (الجليسيرول) هو كحول بسيط عديم اللون وعديم الرائحة ولزج. له طعم حلو ويستخدم في العديد من التطبيقات.',
+                uses: ['في صناعة الأغذية', 'في صناعة الأدوية', 'في صناعة مستحضرات التجميل', 'في صناعة البلاستيك', 'في صناعة السجائر الإلكترونية']
+            },
+            {
+                id: 18,
+                name: 'الفينول',
+                formula: 'C<sub>6</sub>H<sub>5</sub>OH',
+                category: 'organic',
+                molarMass: '94.11',
+                melting: '43',
+                boiling: '182',
+                density: '1.07',
+                solubility: 'ذوبانية معتدلة في الماء',
+                description: 'الفينول هو مركب عضوي عطري. هو مادة صلبة بلورية شفافة عند درجة الحرارة العادية وتتحول إلى اللون الوردي أو البنفسجي عند تعرضها للهواء والضوء.',
+                uses: ['في صناعة البلاستيك', 'في صناعة المطاط', 'في صناعة الأدوية', 'في صناعة المطهرات', 'في صناعة الأصباغ']
+            },
+            {
+                id: 19,
+                name: 'الأسيتون',
+                formula: 'CH<sub>3</sub>COCH<sub>3</sub>',
+                category: 'organic',
+                molarMass: '58.08',
+                melting: '-95',
+                boiling: '56',
+                density: '0.784',
+                solubility: 'قابل للامتزاج مع الماء',
+                description: 'الأسيتون (بروبانون) هو الكيتون الأبسط. هو سائل عديم اللون وقابل للاشتعال ويستخدم بشكل أساسي كمذيب.',
+                uses: ['مذيب', 'في صناعة البلاستيك', 'في صناعة الألياف', 'في صناعة الأدوية', 'في صناعة مستحضرات التجميل', 'في صناعة الطلاء']
+            },
+            {
+                id: 20,
+                name: 'الكلوروفيل',
+                formula: 'C<sub>55</sub>H<sub>72</sub>MgN<sub>4</sub>O<sub>5</sub>',
+                category: 'biochemical',
+                molarMass: '893.49',
+                melting: '152-153',
+                boiling: 'يتحلل قبل الغليان',
+                density: 'غير معروف',
+                solubility: 'ذوبانية منخفضة في الماء',
+                description: 'الكلوروفيل هو صبغة خضراء توجد في النباتات والطحالب والبكتيريا الزرقاء. يمتص الضوء في عملية التمثيل الضوئية.',
+                uses: ['في عملية التمثيل الضوئي', 'كمكمل غذائي', 'في صناعة مستحضرات التجميل', 'في الطب البديل', 'في صناعة الأغذية']
+            }
+        ];
+
         // دالة لعرض العناصر
         function displayElements(elementsToShow) {
             const container = document.getElementById('elementsContainer');
-            const noResults = document.getElementById('noResults');
+            const noResults = document.getElementById('noElementsResults');
             
             container.innerHTML = '';
             
@@ -453,6 +988,49 @@
             });
         }
 
+        // دالة لعرض المركبات
+        function displayCompounds(compoundsToShow) {
+            const container = document.getElementById('compoundsContainer');
+            const noResults = document.getElementById('noCompoundsResults');
+            
+            container.innerHTML = '';
+            
+            if (compoundsToShow.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            compoundsToShow.forEach(compound => {
+                const compoundCard = document.createElement('div');
+                compoundCard.className = 'col-md-3 col-sm-4 col-6';
+                
+                const categoryClass = `category-${compound.category}`;
+                const categoryName = getCompoundCategoryName(compound.category);
+                
+                compoundCard.innerHTML = `
+                    <div class="element-card" onclick="showCompoundDetails(${compound.id})">
+                        <div id="compound-image-${compound.id}" class="element-image">
+                            <div class="loading-spinner">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">جاري التحميل...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="compound-formula">${compound.formula}</div>
+                        <div class="element-name">${compound.name}</div>
+                        <span class="compound-category ${categoryClass}">${categoryName}</span>
+                    </div>
+                `;
+                
+                container.appendChild(compoundCard);
+                
+                // تحميل صورة المركب
+                loadCompoundImage(compound.id, compound.name);
+            });
+        }
+
         // دالة لتحميل صورة العنصر
         function loadElementImage(elementNumber, elementSymbol) {
             const imageContainer = document.getElementById(`image-${elementNumber}`);
@@ -477,6 +1055,14 @@
                     // في حالة وجود خطأ، استخدم صورة من Google Images
                     imageContainer.innerHTML = `<img src="https://source.unsplash.com/300x200/?${elementSymbol},chemistry" alt="${elementSymbol}" class="element-image">`;
                 });
+        }
+
+        // دالة لتحميل صورة المركب
+        function loadCompoundImage(compoundId, compoundName) {
+            const imageContainer = document.getElementById(`compound-image-${compoundId}`);
+            
+            // استخدام صورة من Unsplash مع اسم المركب
+            imageContainer.innerHTML = `<img src="https://source.unsplash.com/300x200/?${compoundName},chemical" alt="${compoundName}" class="element-image">`;
         }
 
         // دالة لتحميل صورة العنصر في النافذة المنبثقة
@@ -505,6 +1091,14 @@
                 });
         }
 
+        // دالة لتحميل صورة المركب في النافذة المنبثقة
+        function loadModalCompoundImage(compoundName) {
+            const modalImageContainer = document.getElementById('modalCompoundImageContainer');
+            
+            // استخدام صورة من Unsplash مع اسم المركب
+            modalImageContainer.innerHTML = `<img src="https://source.unsplash.com/600x400/?${compoundName},chemical" alt="${compoundName}" class="element-image">`;
+        }
+
         // دالة للحصول على اسم التصنيف بالعربية
         function getCategoryName(category) {
             const categories = {
@@ -518,6 +1112,18 @@
                 'noble': 'غاز نبيل',
                 'lanthanide': 'لانثانيد',
                 'actinide': 'أكتينيد'
+            };
+            
+            return categories[category] || category;
+        }
+
+        // دالة للحصول على اسم تصنيف المركب بالعربية
+        function getCompoundCategoryName(category) {
+            const categories = {
+                'organic': 'مركب عضوي',
+                'inorganic': 'مركب غير عضوي',
+                'biochemical': 'مركب كيميائي حيوي',
+                'industrial': 'مركب صناعي'
             };
             
             return categories[category] || category;
@@ -548,10 +1154,42 @@
             modal.show();
         }
 
+        // دالة لعرض تفاصيل المركب
+        function showCompoundDetails(compoundId) {
+            const compound = compounds.find(c => c.id === compoundId);
+            
+            if (!compound) return;
+            
+            // تحميل صورة المركب في النافذة المنبثقة
+            loadModalCompoundImage(compound.name);
+            
+            document.getElementById('modalCompoundName').textContent = compound.name;
+            document.getElementById('modalCompoundFormula').innerHTML = compound.formula;
+            document.getElementById('modalCompoundType').textContent = getCompoundCategoryName(compound.category);
+            document.getElementById('modalCompoundMolarMass').textContent = compound.molarMass;
+            document.getElementById('modalCompoundMelting').textContent = compound.melting + '°C';
+            document.getElementById('modalCompoundBoiling').textContent = compound.boiling + '°C';
+            document.getElementById('modalCompoundDensity').textContent = compound.density + ' g/cm³';
+            document.getElementById('modalCompoundSolubility').textContent = compound.solubility;
+            document.getElementById('modalCompoundDescription').textContent = compound.description;
+            
+            // عرض الاستخدامات
+            const usesList = document.getElementById('modalCompoundUses');
+            usesList.innerHTML = '';
+            compound.uses.forEach(use => {
+                const li = document.createElement('li');
+                li.textContent = use;
+                usesList.appendChild(li);
+            });
+            
+            const modal = new bootstrap.Modal(document.getElementById('compoundModal'));
+            modal.show();
+        }
+
         // دالة للبحث عن العناصر
         function searchElements() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
+            const activeCategory = document.querySelector('#elementFilterButtons .filter-btn.active').dataset.category;
             
             let filteredElements = elements;
             
@@ -571,16 +1209,62 @@
             displayElements(filteredElements);
         }
 
-        // دالة لتغيير الفلتر
-        function setFilter(category) {
+        // دالة للبحث عن المركبات
+        function searchCompounds() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeCategory = document.querySelector('#compoundFilterButtons .filter-btn.active').dataset.category;
+            
+            let filteredCompounds = compounds;
+            
+            // تطبيق فلتر التصنيف
+            if (activeCategory !== 'all') {
+                filteredCompounds = filteredCompounds.filter(compound => compound.category === activeCategory);
+            }
+            
+            // تطبيق فلتر البحث
+            if (searchTerm) {
+                filteredCompounds = filteredCompounds.filter(compound => 
+                    compound.name.toLowerCase().includes(searchTerm) || 
+                    compound.formula.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            displayCompounds(filteredCompounds);
+        }
+
+        // دالة لتغيير فلتر العناصر
+        function setElementFilter(category) {
             // تحديث الأزرار النشطة
-            document.querySelectorAll('.filter-btn').forEach(btn => {
+            document.querySelectorAll('#elementFilterButtons .filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            document.querySelector(`#elementFilterButtons [data-category="${category}"]`).classList.add('active');
             
             // تطبيق البحث والفلتر
             searchElements();
+        }
+
+        // دالة لتغيير فلتر المركبات
+        function setCompoundFilter(category) {
+            // تحديث الأزرار النشطة
+            document.querySelectorAll('#compoundFilterButtons .filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`#compoundFilterButtons [data-category="${category}"]`).classList.add('active');
+            
+            // تطبيق البحث والفلتر
+            searchCompounds();
+        }
+
+        // دالة للبحث بناءً على التبويب النشط
+        function searchBasedOnActiveTab() {
+            const activeTab = document.querySelector('#mainTabs .nav-link.active').getAttribute('data-bs-target');
+            
+            if (activeTab === '#elements') {
+                searchElements();
+            } else if (activeTab === '#compounds') {
+                searchCompounds();
+            }
         }
 
         // إضافة مستمعي الأحداث
@@ -589,15 +1273,38 @@
             displayElements(elements);
             
             // مستمع البحث
-            document.getElementById('searchInput').addEventListener('input', searchElements);
+            document.getElementById('searchInput').addEventListener('input', searchBasedOnActiveTab);
             
             // مستمع أيقونة البحث
-            document.getElementById('searchIcon').addEventListener('click', searchElements);
+            document.getElementById('searchIcon').addEventListener('click', searchBasedOnActiveTab);
             
-            // مستمعي أزرار الفلتر
-            document.querySelectorAll('.filter-btn').forEach(btn => {
+            // مستمعي أزرار فلتر العناصر
+            document.querySelectorAll('#elementFilterButtons .filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    setFilter(btn.dataset.category);
+                    setElementFilter(btn.dataset.category);
+                });
+            });
+            
+            // مستمعي أزرار فلتر المركبات
+            document.querySelectorAll('#compoundFilterButtons .filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setCompoundFilter(btn.dataset.category);
+                });
+            });
+            
+            // مستمع تغيير التبويب
+            document.querySelectorAll('#mainTabs .nav-link').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', event => {
+                    const target = event.target.getAttribute('data-bs-target');
+                    
+                    if (target === '#elements') {
+                        displayElements(elements);
+                    } else if (target === '#compounds') {
+                        displayCompounds(compounds);
+                    }
+                    
+                    // إعادة تعيين حقل البحث
+                    document.getElementById('searchInput').value = '';
                 });
             });
         });
