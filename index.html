@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الجدول الدوري للعناصر الكيميائية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            padding-bottom: 30px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            border-radius: 25px;
+            padding: 12px 50px 12px 20px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            outline: none;
+        }
+
+        .element-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .element-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .element-symbol {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .element-name {
+            font-size: 18px;
+            color: var(--dark-color);
+        }
+
+        .element-number {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .element-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .element-details {
+            text-align: right;
+        }
+
+        .element-details h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .element-details p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            border-radius: 20px;
+            padding: 8px 15px;
+            border: none;
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .element-category {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .category-alkali { background-color: #ff7043; color: white; }
+        .category-alkaline { background-color: #ffca28; color: #333; }
+        .category-transition { background-color: #29b6f6; color: white; }
+        .category-post-transition { background-color: #66bb6a; color: white; }
+        .category-metalloid { background-color: #ab47bc; color: white; }
+        .category-nonmetal { background-color: #ef5350; color: white; }
+        .category-halogen { background-color: #26c6da; color: white; }
+        .category-noble { background-color: #5c6bc0; color: white; }
+        .category-lanthanide { background-color: #8d6e63; color: white; }
+        .category-actinide { background-color: #78909c; color: white; }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .image-error {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 150px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .filter-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1 class="text-center mb-0">الجدول الدوري للعناصر الكيميائية</h1>
+            <p class="text-center mb-0">ابحث عن العناصر الكيميائية بالاسم أو الرمز</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن عنصر بالاسم أو الرمز...">
+                <i class="bi bi-search search-icon" id="searchIcon"></i>
+            </div>
+            
+            <div class="filter-buttons mt-3" id="filterButtons">
+                <button class="filter-btn active" data-category="all">الكل</button>
+                <button class="filter-btn" data-category="alkali">فلزات قلوية</button>
+                <button class="filter-btn" data-category="alkaline">فلزات قلوية ترابية</button>
+                <button class="filter-btn" data-category="transition">فلزات انتقالية</button>
+                <button class="filter-btn" data-category="post-transition">فلزات ما بعد انتقالية</button>
+                <button class="filter-btn" data-category="metalloid">شبه فلزات</button>
+                <button class="filter-btn" data-category="nonmetal">لا فلزات</button>
+                <button class="filter-btn" data-category="halogen">هالوجينات</button>
+                <button class="filter-btn" data-category="noble">غازات نبيلة</button>
+                <button class="filter-btn" data-category="lanthanide">لانثانيدات</button>
+                <button class="filter-btn" data-category="actinide">أكتينيدات</button>
+            </div>
+        </div>
+
+        <div id="elementsContainer" class="row">
+            <!-- سيتم عرض العناصر هنا -->
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <i class="bi bi-search" style="font-size: 48px;"></i>
+            <h3>لا توجد نتائج</h3>
+            <p>يرجى البحث بكلمة أخرى أو محاولة استخدام مرشحات مختلفة</p>
+        </div>
+    </div>
+
+    <!-- Modal لعرض تفاصيل العنصر -->
+    <div class="modal fade" id="elementModal" tabindex="-1" aria-labelledby="elementModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="elementModalLabel">تفاصيل العنصر</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div id="modalImageContainer">
+                                <div class="loading-spinner">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">جاري التحميل...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 element-details">
+                            <h3 id="modalElementName"></h3>
+                            <p><strong>الرمز:</strong> <span id="modalElementSymbol"></span></p>
+                            <p><strong>الرقم الذري:</strong> <span id="modalElementNumber"></span></p>
+                            <p><strong>الكتلة الذرية:</strong> <span id="modalElementWeight"></span></p>
+                            <p><strong>المجموعة:</strong> <span id="modalElementGroup"></span></p>
+                            <p><strong>الفترة:</strong> <span id="modalElementPeriod"></span></p>
+                            <p><strong>التصنيف:</strong> <span id="modalElementCategory"></span></p>
+                            <p><strong>درجة الانصهار:</strong> <span id="modalElementMelting"></span></p>
+                            <p><strong>درجة الغليان:</strong> <span id="modalElementBoiling"></span></p>
+                            <p><strong>الكثافة:</strong> <span id="modalElementDensity"></span></p>
+                            <p id="modalElementDescription"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // بيانات العناصر الكيميائية
+        const elements = [
+            { number: 1, symbol: 'H', name: 'هيدروجين', category: 'nonmetal', weight: '1.008', group: '1', period: '1', melting: '-259.14', boiling: '-252.87', density: '0.00009', description: 'الهيدروجين هو أخف عنصر كيميائي وأكثرها وفرة في الكون. وهو عنصر لا فلزي وعديم اللون والرائحة.' },
+            { number: 2, symbol: 'He', name: 'هيليوم', category: 'noble', weight: '4.003', group: '18', period: '1', melting: '-272.2', boiling: '-268.93', density: '0.00018', description: 'الهيليوم هو غاز نبيل وعديم اللون والرائحة والطعم. وهو ثاني أخف عنصر في الكون ويستخدم في بالونات الهواء.' },
+            { number: 3, symbol: 'Li', name: 'ليثيوم', category: 'alkali', weight: '6.941', group: '1', period: '2', melting: '180.5', boiling: '1342', density: '0.534', description: 'الليثيوم هو فلز قلوي ناعم فضي اللون. وهو أخف فلز صلب ويستخدم في البطاريات القابلة لإعادة الشحن.' },
+            { number: 4, symbol: 'Be', name: 'بريليوم', category: 'alkaline', weight: '9.012', group: '2', period: '2', melting: '1287', boiling: '2469', density: '1.85', description: 'البريليوم هو فلز قلوي ترابي صلب رمادي اللون. يتميز بصلابته وخفة وزنه ويستخدم في سبائك الطائرات.' },
+            { number: 5, symbol: 'B', name: 'بورون', category: 'metalloid', weight: '10.81', group: '13', period: '2', melting: '2075', boiling: '4000', density: '2.34', description: 'البورون هو شبه فلز مهم للمصانع الكيميائية والنباتات. ويستخدم في صناعة الزجاج والمنظفات.' },
+            { number: 6, symbol: 'C', name: 'كربون', category: 'nonmetal', weight: '12.01', group: '14', period: '2', melting: '3550', boiling: '4027', density: '2.267', description: 'الكربون هو عنصر لا فلزي أساسي للحياة. وهو موجود في العديد من الأشكال مثل الماس والجرافيت.' },
+            { number: 7, symbol: 'N', name: 'نيتروجين', category: 'nonmetal', weight: '14.01', group: '15', period: '2', melting: '-210', boiling: '-195.79', density: '0.00125', description: 'النيتروجين هو غاز لا فلزي عديم اللون والرائحة. يشكل حوالي 78% من غلاف الأرض الجوي وهو ضروري لنمو النباتات.' },
+            { number: 8, symbol: 'O', name: 'أكسجين', category: 'nonmetal', weight: '16.00', group: '16', period: '2', melting: '-218.79', boiling: '-182.96', density: '0.00143', description: 'الأكسجين هو غاز لا فلزي عديم اللون والرائحة. وهو ضروري لتنفس الكائنات الحية ويشكل حوالي 21% من غلاف الأرض الجوي.' },
+            { number: 9, symbol: 'F', name: 'فلور', category: 'halogen', weight: '19.00', group: '17', period: '2', melting: '-219.67', boiling: '-188.11', density: '0.0017', description: 'الفلور هو غاز هالوجين أصفر شاحب سام. وهو أكثر العناصر تفاعلاً ويستخدم في معاجين الأسنان لمنع التسوس.' },
+            { number: 10, symbol: 'Ne', name: 'نيون', category: 'noble', weight: '20.18', group: '18', period: '2', melting: '-248.59', boiling: '-246.08', density: '0.0009', description: 'النيون هو غاز نبيل عديم اللون والرائحة. يستخدم في الإضاءة في اللافتات النيونية وفي صناعة الإلكترونيات.' },
+            { number: 11, symbol: 'Na', name: 'صوديوم', category: 'alkali', weight: '22.99', group: '1', period: '3', melting: '97.72', boiling: '883', density: '0.968', description: 'الصوديوم هو فلز قلوي ناعم فضي اللون. وهو شديد التفاعل مع الماء ويوجد في ملح الطعام (كلوريد الصوديوم).' },
+            { number: 12, symbol: 'Mg', name: 'مغنيسيوم', category: 'alkaline', weight: '24.31', group: '2', period: '3', melting: '650', boiling: '1090', density: '1.738', description: 'المغنيسيوم هو فلز قلوي ترابي فضي اللون. وهو خفيف الوزن ويستخدم في سبائك الألومنيوم وفي الألعاب النارية.' },
+            { number: 13, symbol: 'Al', name: 'ألومنيوم', category: 'post-transition', weight: '26.98', group: '13', period: '3', melting: '660.32', boiling: '2519', density: '2.7', description: 'الألومنيوم هو فلز ما بعد انتقالي فضي اللون وخفيف الوزن. وهو مقاوم للتآكل ويستخدم في صناعة العلب والطائرات.' },
+            { number: 14, symbol: 'Si', name: 'سيليكون', category: 'metalloid', weight: '28.09', group: '14', period: '3', melting: '1414', boiling: '3265', density: '2.3296', description: 'السيليكون هو شبه فلز رمادي اللون وهو ثاني أكثر العناصر وفرة في القشرة الأرضية. يستخدم في صناعة الإلكترونيات والزجاج.' },
+            { number: 15, symbol: 'P', name: 'فوسفور', category: 'nonmetal', weight: '30.97', group: '15', period: '3', melting: '44.15', boiling: '280.5', density: '1.823', description: 'الفوسفور هو عنصر لا فلزي شائع في الأحماض النووية والفوسفوليبيدات. وهو ضروري لنمو النباتات ويستخدم في الأسمدة.' },
+            { number: 16, symbol: 'S', name: 'كبريت', category: 'nonmetal', weight: '32.07', group: '16', period: '3', melting: '115.21', boiling: '444.61', density: '2.067', description: 'الكبريت هو عنصر لا فلزي أصفر اللون. يستخدم في صناعة المطاط والأسمدة والأدوية.' },
+            { number: 17, symbol: 'Cl', name: 'كلور', category: 'halogen', weight: '35.45', group: '17', period: '3', melting: '-101.5', boiling: '-34.04', density: '0.0032', description: 'الكلور هو غاز هالوجين أصفر مائل للخضرة وسام. يستخدم في تعقيم مياه الشرب وفي صناعة البلاستيك.' },
+            { number: 18, symbol: 'Ar', name: 'أرغون', category: 'noble', weight: '39.95', group: '18', period: '3', melting: '-189.35', boiling: '-185.85', density: '0.00178', description: 'الأرغون هو غاز نبيل عديم اللون والرائحة. يستخدم في المصابيح الكهربائية وفي لحام المعادن.' },
+            { number: 19, symbol: 'K', name: 'بوتاسيوم', category: 'alkali', weight: '39.10', group: '1', period: '4', melting: '63.5', boiling: '759', density: '0.89', description: 'البوتاسيوم هو فلز قلوي ناعم فضي اللون. وهو ضروري لوظائف الخلايا الحية ويوجد في الموز والبطاطس.' },
+            { number: 20, symbol: 'Ca', name: 'كالسيوم', category: 'alkaline', weight: '40.08', group: '2', period: '4', melting: '842', boiling: '1484', density: '1.54', description: 'الكالسيوم هو فلز قلوي ترابي رمادي اللون. وهو ضروري لنمو العظام والأسنان ويوجد في الحليب والجبن.' },
+            { number: 21, symbol: 'Sc', name: 'سكانديوم', category: 'transition', weight: '44.96', group: '3', period: '4', melting: '1541', boiling: '2836', density: '2.985', description: 'السكانديوم هو فلز انتقالي ناعم فضي اللون. يستخدم في سبائك الألومنيوم لصنع معدات رياضية عالية الجودة.' },
+            { number: 22, symbol: 'Ti', name: 'تيتانيوم', category: 'transition', weight: '47.87', group: '4', period: '4', melting: '1668', boiling: '3287', density: '4.506', description: 'التيتانيوم هو فلز انتقالي قوي وخفيف الوزن. وهو مقاوم للتآكل ويستخدم في صناعة الطائرات وزراعة الأسنان.' },
+            { number: 23, symbol: 'V', name: 'فاناديوم', category: 'transition', weight: '50.94', group: '5', period: '4', melting: '1910', boiling: '3407', density: '6.11', description: 'الفاناديوم هو فلز انتقالي صلب رمادي أزرق. يستخدم في صناعة الفولاذ وفي البطاريات.' },
+            { number: 24, symbol: 'Cr', name: 'كروم', category: 'transition', weight: '52.00', group: '6', period: '4', melting: '1907', boiling: '2671', density: '7.19', description: 'الكروم هو فلز انتقالي صلب لامع. يستخدم في طلاء المعادن لمنع الصدأ وفي صناعة الفولاذ المقاوم للصدأ.' },
+            { number: 25, symbol: 'Mn', name: 'منغنيز', category: 'transition', weight: '54.94', group: '7', period: '4', melting: '1246', boiling: '2061', density: '7.21', description: 'المنغنيز هو فلز انتقالي صلب هش. يستخدم في صناعة الفولاذ وفي البطاريات.' },
+            { number: 26, symbol: 'Fe', name: 'حديد', category: 'transition', weight: '55.85', group: '8', period: '4', melting: '1538', boiling: '2861', density: '7.874', description: 'الحديد هو فلز انتقالي صلب رمادي اللون. وهو أكثر الفلزات استخداماً في العالم ويستخدم في صناعة الصلب والبناء.' },
+            { number: 27, symbol: 'Co', name: 'كوبالت', category: 'transition', weight: '58.93', group: '9', period: '4', melting: '1495', boiling: '2927', density: '8.86', description: 'الكوبالت هو فلز انتقالي صلب فضي مزرق. يستخدم في صناعة المغناطيس القوي وفي البطاريات.' },
+            { number: 28, symbol: 'Ni', name: 'نيكل', category: 'transition', weight: '58.69', group: '10', period: '4', melting: '1455', boiling: '2913', density: '8.908', description: 'النيكل هو فلز انتقالي صلب فضي اللون. يستخدم في صناعة الفولاذ المقاوم للصدأ وفي العملات المعدنية.' },
+            { number: 29, symbol: 'Cu', name: 'نحاس', category: 'transition', weight: '63.55', group: '11', period: '4', melting: '1084.62', boiling: '2562', density: '8.96', description: 'النحاس هو فلز انتقالي ناعم أحمر اللون. وهو موصل جيد للكهرباء ويستخدم في الأسلاك الكهربائية والأنابيب.' },
+            { number: 30, symbol: 'Zn', name: 'زنك', category: 'transition', weight: '65.38', group: '12', period: '4', melting: '419.53', boiling: '907', density: '7.134', description: 'الزنك هو فلز انتقالي صلب أزرق رمادي. يستخدم في طلاء الحديد لمنع الصدأ وفي صناعة البطاريات.' },
+            { number: 31, symbol: 'Ga', name: 'غاليوم', category: 'post-transition', weight: '69.72', group: '13', period: '4', melting: '29.76', boiling: '2204', density: '5.907', description: 'الغاليوم هو فلز ما بعد انتقالي ناعم فضي اللون. ينصهر في درجة حرارة منخفضة ويستخدم في الإلكترونيات.' },
+            { number: 32, symbol: 'Ge', name: 'جرمانيوم', category: 'metalloid', weight: '72.63', group: '14', period: '4', melting: '938.25', boiling: '2833', density: '5.323', description: 'الجرمانيوم هو شبه فلز صلب رمادي اللون. يستخدم في صناعة أشباه الموصلات والعدسات البصرية.' },
+            { number: 33, symbol: 'As', name: 'زرنيخ', category: 'metalloid', weight: '74.92', group: '15', period: '4', melting: '817', boiling: '614', density: '5.727', description: 'الزرنيخ هو شبه فلز رمادي اللون وهو سام. يستخدم في صناعة مبيدات الآفات وفي بعض سبائك الرصاص.' },
+            { number: 34, symbol: 'Se', name: 'سيلينيوم', category: 'nonmetal', weight: '78.96', group: '16', period: '4', melting: '221', boiling: '685', density: '4.819', description: 'السيلينيوم هو عنصر لا فلزي. وهو ضروري بكميات قليلة للجسم ويستخدم في صناعة الخلايا الشمسية.' },
+            { number: 35, symbol: 'Br', name: 'بروم', category: 'halogen', weight: '79.90', group: '17', period: '4', melting: '-7.2', boiling: '58.8', density: '3.1028', description: 'البروم هو سائل هالوجين أحمر بني متطاير وسام. يستخدم في صناعة المبيدات وفي بعض الأدوية.' },
+            { number: 36, symbol: 'Kr', name: 'كريبتون', category: 'noble', weight: '83.80', group: '18', period: '4', melting: '-157.36', boiling: '-153.22', density: '0.0037', description: 'الكريبتون هو غاز نبيل عديم اللون والرائحة. يستخدم في المصابيح الكهربائية وفي التصوير الضوئي.' },
+            { number: 37, symbol: 'Rb', name: 'روبيديوم', category: 'alkali', weight: '85.47', group: '1', period: '5', melting: '39.3', boiling: '688', density: '1.532', description: 'الروبيديوم هو فلز قلوي ناعم فضي اللون. يستخدم في الساعات الذرية وفي البحث العلمي.' },
+            { number: 38, symbol: 'Sr', name: 'سترونتيوم', category: 'alkaline', weight: '87.62', group: '2', period: '5', melting: '777', boiling: '1377', density: '2.64', description: 'السترونتيوم هو فلز قلوي ترابي صلب فضي أصفر. يستخدم في الألعاب النارية وفي صناعة الزجاج.' },
+            { number: 39, symbol: 'Y', name: 'إتريوم', category: 'transition', weight: '88.91', group: '3', period: '5', melting: '1522', boiling: '3345', density: '4.472', description: 'الإتريوم هو فلز انتقالي صلب فضي لامع. يستخدم في صناعة الليزر وفي سبائك السوبر كونداكتور.' },
+            { number: 40, symbol: 'Zr', name: 'زركونيوم', category: 'transition', weight: '91.22', group: '4', period: '5', melting: '1855', boiling: '4409', density: '6.52', description: 'الزركونيوم هو فلز انتقالي صلب رمادي أبيض. وهو مقاوم للتآكل ويستخدم في المفاعلات النووية.' },
+            { number: 41, symbol: 'Nb', name: 'نيوبيوم', category: 'transition', weight: '92.91', group: '5', period: '5', melting: '2477', boiling: '4744', density: '8.57', description: 'النيوبيوم هو فلز انتقالي صلب رمادي لامع. يستخدم في سبائك الفولاذ وفي صناعة المجوهرات.' },
+            { number: 42, symbol: 'Mo', name: 'موليبدينوم', category: 'transition', weight: '95.94', group: '6', period: '5', melting: '2623', boiling: '4639', density: '10.28', description: 'الموليبدينوم هو فلز انتقالي صلب فضي اللون. يستخدم في صناعة الفولاذ وفي الزيوت المعدنية.' },
+            { number: 43, symbol: 'Tc', name: 'تكنيشيوم', category: 'transition', weight: '98', group: '7', period: '5', melting: '2157', boiling: '4265', density: '11', description: 'التكنيشيوم هو فلز انتقالي مشع وهو أول عنصر تم إنتاجه صناعياً. يستخدم في الطب النووي.' },
+            { number: 44, symbol: 'Ru', name: 'روثينيوم', category: 'transition', weight: '101.1', group: '8', period: '5', melting: '2334', boiling: '4150', density: '12.45', description: 'الروثينيوم هو فلز انتقالي نادر صلب أبيض. يستخدم في صناعة المجوهرات وفي الإلكترونيات.' },
+            { number: 45, symbol: 'Rh', name: 'روديوم', category: 'transition', weight: '102.9', group: '9', period: '5', melting: '1964', boiling: '3695', density: '12.41', description: 'الروديوم هو فلز انتقالي نادر صلب أبيض فضي. يستخدم في صناعة المجوهرات وفي المحولات الحفازة للسيارات.' },
+            { number: 46, symbol: 'Pd', name: 'بالاديوم', category: 'transition', weight: '106.4', group: '10', period: '5', melting: '1554.9', boiling: '2963', density: '12.02', description: 'البالاديوم هو فلز انتقالي نادر صلب أبيض فضي. يستخدم في صناعة المجوهرات وفي المحولات الحفازة للسيارات.' },
+            { number: 47, symbol: 'Ag', name: 'فضة', category: 'transition', weight: '107.9', group: '11', period: '5', melting: '961.78', boiling: '2162', density: '10.501', description: 'الفضة هي فلز انتقالي ناعم أبيض لامع. وهي موصلة جيدة للكهرباء وتستخدم في المجوهرات والصك النقدي.' },
+            { number: 48, symbol: 'Cd', name: 'كادميوم', category: 'transition', weight: '112.4', group: '12', period: '5', melting: '321.07', boiling: '767', density: '8.65', description: 'الكادميوم هو فلز انتقالي صلب أزرق مائل للبياض. وهو سام ويستخدم في البطاريات وفي الطلاء.' },
+            { number: 49, symbol: 'In', name: 'إنديوم', category: 'post-transition', weight: '114.8', group: '13', period: '5', melting: '156.6', boiling: '2072', density: '7.31', description: 'الإنديوم هو فلز ما بعد انتقالي ناعم فضي اللون. يستخدم في الإلكترونيات وفي الشاشات اللمسية.' },
+            { number: 50, symbol: 'Sn', name: 'قصدير', category: 'post-transition', weight: '118.7', group: '14', period: '5', melting: '231.93', boiling: '2602', density: '7.265', description: 'القصدير هو فلز ما بعد انتقالي ناعم أبيض فضي. يستخدم في لحام المعادن وفي صناعة العلب.' },
+            { number: 51, symbol: 'Sb', name: 'أنتيمون', category: 'metalloid', weight: '121.8', group: '15', period: '5', melting: '630.63', boiling: '1587', density: '6.697', description: 'الأنتيمون هو شبه فلز صلب فضي متبلور. يستخدم في صناعة البطاريات وفي مواد مكافحة اللهب.' },
+            { number: 52, symbol: 'Te', name: 'تيلوريوم', category: 'metalloid', weight: '127.6', group: '16', period: '5', melting: '449.51', boiling: '988', density: '6.24', description: 'التيلوريوم هو شبه فلز فضي مائل للبياض. يستخدم في سبائك الفولاذ وفي صناعة أشباه الموصلات.' },
+            { number: 53, symbol: 'I', name: 'يود', category: 'halogen', weight: '126.9', group: '17', period: '5', melting: '113.7', boiling: '184.3', density: '4.933', description: 'اليود هو هالوجين صلب أزرق داكن. وهو ضروري لوظيفة الغدة الدرقية ويستخدم في المطهرات.' },
+            { number: 54, symbol: 'Xe', name: 'زينون', category: 'noble', weight: '131.3', group: '18', period: '5', melting: '-111.8', boiling: '-108.1', density: '0.0059', description: 'الزينون هو غاز نبيل عديم اللون والرائحة. يستخدم في المصابيح القوية وفي التخدير.' },
+            { number: 55, symbol: 'Cs', name: 'سيزيوم', category: 'alkali', weight: '132.9', group: '1', period: '6', melting: '28.44', boiling: '671', density: '1.93', description: 'السيزيوم هو فلز قلوي ناعم ذهبي اللون. وهو نشط كيميائياً ويستخدم في الساعات الذرية.' },
+            { number: 56, symbol: 'Ba', name: 'باريوم', category: 'alkaline', weight: '137.3', group: '2', period: '6', melting: '727', boiling: '1845', density: '3.51', description: 'الباريوم هو فلز قلالي ترابي صلب فضي. يستخدم في الأشعة السينية وفي صناعة الزجاج.' },
+            { number: 57, symbol: 'La', name: 'لانثانوم', category: 'lanthanide', weight: '138.9', group: '3', period: '6', melting: '920', boiling: '3464', density: '6.162', description: 'اللانثانوم هو فلز لانثانيد ناعم فضي اللون. يستخدم في صناعة البطاريات وفي الإلكترونيات.' },
+            { number: 58, symbol: 'Ce', name: 'سيريوم', category: 'lanthanide', weight: '140.1', group: '3', period: '6', melting: '798', boiling: '3257', density: '6.77', description: 'السيريوم هو فلز لانثانيد حديدي اللون. يستخدم في صناعة المحفزات وفي طلاء الزجاج.' },
+            { number: 59, symbol: 'Pr', name: 'براسيوديميوم', category: 'lanthanide', weight: '140.9', group: '3', period: '6', melting: '931', boiling: '3130', density: '6.77', description: 'البراسيوديميوم هو فلز لانثانيد ناعم فضي مائل للصفرة. يستخدم في صناعة المغناطيس وفي الليزر.' },
+            { number: 60, symbol: 'Nd', name: 'نوديميوم', category: 'lanthanide', weight: '144.2', group: '3', period: '6', melting: '1024', boiling: '3074', density: '7.01', description: 'النوديميوم هو فلز لانثانيد ناعم فضي مائل للصفرة. يستخدم في صناعة المغناطيس القوي.' },
+            { number: 61, symbol: 'Pm', name: 'بروميثيوم', category: 'lanthanide', weight: '145', group: '3', period: '6', melting: '1042', boiling: '3000', density: '7.26', description: 'البروميثيوم هو فلز لانثانيد مشع. يستخدم في صناعة البطاريات النووية وفي الطلاء اللامع.' },
+            { number: 62, symbol: 'Sm', name: 'ساماريوم', category: 'lanthanide', weight: '150.4', group: '3', period: '6', melting: '1072', boiling: '1794', density: '7.52', description: 'الساماريوم هو فلز لانثانيد صلب فضي مائل للصفرة. يستخدم في صناعة المغناطيس وفي المفاعلات النووية.' },
+            { number: 63, symbol: 'Eu', name: 'يوروبيوم', category: 'lanthanide', weight: '152.0', group: '3', period: '6', melting: '822', boiling: '1529', density: '5.244', description: 'اليوروبيوم هو فلز لانثانيد صلب فضي. يستخدم في صناعة الشاشات الملونة وفي الليزر.' },
+            { number: 64, symbol: 'Gd', name: 'غادولينيوم', category: 'lanthanide', weight: '157.3', group: '3', period: '6', melting: '1313', boiling: '3273', density: '7.9', description: 'الغادولينيوم هو فلز لانثانيد صلب فضي. يستخدم في التصوير بالرنين المغناطيسي وفي صناعة المغناطيس.' },
+            { number: 65, symbol: 'Tb', name: 'تربيوم', category: 'lanthanide', weight: '158.9', group: '3', period: '6', melting: '1356', boiling: '3230', density: '8.23', description: 'التربيوم هو فلز لانثانيد صلب فضي رمادي. يستخدم في صناعة الإلكترونيات وفي الليزر.' },
+            { number: 66, symbol: 'Dy', name: 'ديسبروسيوم', category: 'lanthanide', weight: '162.5', group: '3', period: '6', melting: '1412', boiling: '2567', density: '8.55', description: 'الديسبروسيوم هو فلز لانثانيد صلب فضي مائل للصفرة. يستخدم في صناعة المغناطيس القوي.' },
+            { number: 67, symbol: 'Ho', name: 'هولميوم', category: 'lanthanide', weight: '164.9', group: '3', period: '6', melting: '1474', boiling: '2700', density: '8.79', description: 'الهولميوم هو فلز لانثانيد صلب فضي. يستخدم في صناعة المغناطيس وفي الليزر.' },
+            { number: 68, symbol: 'Er', name: 'إيربيوم', category: 'lanthanide', weight: '167.3', group: '3', period: '6', melting: '1529', boiling: '2868', density: '9.066', description: 'الإيربيوم هو فلز لانثانيد صلب فضي مائل للصفرة. يستخدم في الليزر وفي صناعة الزجاج.' },
+            { number: 69, symbol: 'Tm', name: 'توليوم', category: 'lanthanide', weight: '168.9', group: '3', period: '6', melting: '1545', boiling: '1950', density: '9.32', description: 'التوليوم هو فلز لانثانيد صلب فضي رمادي. يستخدم في الليزر وفي صناعة الإلكترونيات.' },
+            { number: 70, symbol: 'Yb', name: 'يتربيوم', category: 'lanthanide', weight: '173.0', group: '3', period: '6', melting: '819', boiling: '1196', density: '6.965', description: 'اليتربيوم هو فلز لانثانيد ناعم فضي مائل للصفرة. يستخدم في الليزر وفي صناعة الإلكترونيات.' },
+            { number: 71, symbol: 'Lu', name: 'لوثيتيوم', category: 'lanthanide', weight: '175.0', group: '3', period: '6', melting: '1663', boiling: '3402', density: '9.841', description: 'اللوثيتيوم هو فلز لانثانيد صلب فضي. يستخدم في صناعة الإلكترونيات وفي الليزر.' },
+            { number: 72, symbol: 'Hf', name: 'هافنيوم', category: 'transition', weight: '178.5', group: '4', period: '6', melting: '2233', boiling: '4603', density: '13.31', description: 'الهافنيوم هو فلز انتقالي صلب فضي لامع. يستخدم في المفاعلات النووية وفي سبائك السوبر كونداكتور.' },
+            { number: 73, symbol: 'Ta', name: 'تانتالوم', category: 'transition', weight: '180.9', group: '5', period: '6', melting: '3017', boiling: '5458', density: '16.69', description: 'التانتالوم هو فلز انتقالي صلب رمادي أزرق. وهو مقاوم للتآكل ويستخدم في الإلكترونيات وفي المعدات الطبية.' },
+            { number: 74, symbol: 'W', name: 'تنجستن', category: 'transition', weight: '183.8', group: '6', period: '6', melting: '3422', boiling: '5555', density: '19.25', description: 'التنجستن هو فلز انتقالي صلب رمادي أبيض. له أعلى نقطة انصهار بين العناصر ويستخدم في المصابيح المتوهجة.' },
+            { number: 75, symbol: 'Re', name: 'رينيوم', category: 'transition', weight: '186.2', group: '7', period: '6', melting: '3186', boiling: '5596', density: '21.02', description: 'الرينيوم هو فلز انتقالي صلب فضي أبيض. له نقطة انصهار عالية ويستخدم في المحركات النفاثة وفي الثرموكوبلز.' },
+            { number: 76, symbol: 'Os', name: 'أوزميوم', category: 'transition', weight: '190.2', group: '8', period: '6', melting: '3033', boiling: '5012', density: '22.59', description: 'الأوزميوم هو فلز انتقالي صلب هش أزرق مائل للبياض. وهو أثقل عنصر طبيعي ويستخدم في أقلام الحبر.' },
+            { number: 77, symbol: 'Ir', name: 'إيريديوم', category: 'transition', weight: '192.2', group: '9', period: '6', melting: '2466', boiling: '4428', density: '22.56', description: 'الإيريديوم هو فلز انتقالي صلب هش أبيض. وهو مقاوم للتآكل ويستخدم في الأجهزة الكهربائية وفي المجوهرات.' },
+            { number: 78, symbol: 'Pt', name: 'بلاتين', category: 'transition', weight: '195.1', group: '10', period: '6', melting: '1768.3', boiling: '3825', density: '21.45', description: 'البلاتين هو فلز انتقالي نادر صلب أبيض فضي. وهو مقاوم للتآكل ويستخدم في المجوهرات وفي المحولات الحفازة.' },
+            { number: 79, symbol: 'Au', name: 'ذهب', category: 'transition', weight: '197.0', group: '11', period: '6', melting: '1064.18', boiling: '2856', density: '19.282', description: 'الذهب هو فلز انتقالي ناعم أصفر براق. وهو ثمين جداً ويستخدم في المجوهرات والعملات وفي الإلكترونيات.' },
+            { number: 80, symbol: 'Hg', name: 'زئبق', category: 'transition', weight: '200.6', group: '12', period: '6', melting: '-38.83', boiling: '356.73', density: '13.534', description: 'الزئبق هو فلز انتقالي سائل فضي. وهو سام ويستخدم في ميزانات الحرارة وفي بعض الأجهزة العلمية.' },
+            { number: 81, symbol: 'Tl', name: 'ثاليوم', category: 'post-transition', weight: '204.4', group: '13', period: '6', melting: '304', boiling: '1473', density: '11.85', description: 'الثاليوم هو فلز ما بعد انتقالي ناعم رمادي. وهو سام ويستخدم في الإلكترونيات وفي البصريات.' },
+            { number: 82, symbol: 'Pb', name: 'رصاص', category: 'post-transition', weight: '207.2', group: '14', period: '6', melting: '327.46', boiling: '1749', density: '11.342', description: 'الرصاص هو فلز ما بعد انتقالي ناعم رمادي مائل للزرقة. وهو سام ويستخدم في البطاريات وفي الحماية من الإشعاع.' },
+            { number: 83, symbol: 'Bi', name: 'بيزموث', category: 'post-transition', weight: '209.0', group: '15', period: '6', melting: '271.4', boiling: '1564', density: '9.78', description: 'البيزموث هو فلز ما بعد انتقالي هش وردي مائل للبياض. يستخدم في الأدوية وفي صناعة الطلاء.' },
+            { number: 84, symbol: 'Po', name: 'بولونيوم', category: 'post-transition', weight: '209', group: '16', period: '6', melting: '254', boiling: '962', density: '9.32', description: 'البولونيوم هو فلز ما بعد انتقالي نادر شديد الإشعاع. وهو شديد السمية ويستخدم في مصادر الإشعاع.' },
+            { number: 85, symbol: 'At', name: 'أستاتين', category: 'halogen', weight: '210', group: '17', period: '6', melting: '302', boiling: '337', density: '7', description: 'الأستاتين هو هالوجين نادر شديد الإشعاع. وهو شديد السمية وله استخدامات محدودة في الطب.' },
+            { number: 86, symbol: 'Rn', name: 'رادون', category: 'noble', weight: '222', group: '18', period: '6', melting: '-71', boiling: '-61.7', density: '0.0097', description: 'الرادون هو غاز نبيل مشع عديم اللون والرائحة. وهو ناتج عن تحلل الراديوم ويسبب سرطان الرئة.' },
+            { number: 87, symbol: 'Fr', name: 'فرانسيوم', category: 'alkali', weight: '223', group: '1', period: '7', melting: '27', boiling: '677', density: '1.87', description: 'الفرانسيوم هو فلز قلوي نادر شديد الإشعاع. وهو شديد النشاط الكيميائي وله عمر نصف قصير جداً.' },
+            { number: 88, symbol: 'Ra', name: 'راديوم', category: 'alkaline', weight: '226', group: '2', period: '7', melting: '700', boiling: '1737', density: '5.5', description: 'الراديوم هو فلز قلالي ترابي شديد الإشعاع أبيض. يستخدم في الطب لعلاج السرطان.' },
+            { number: 89, symbol: 'Ac', name: 'أكتينيوم', category: 'actinide', weight: '227', group: '3', period: '7', melting: '1051', boiling: '3200', density: '10.07', description: 'الأكتينيوم هو فلز أكتينيد شديد الإشعاع فضي. يستخدم في الطب لعلاج السرطان.' },
+            { number: 90, symbol: 'Th', name: 'ثوريوم', category: 'actinide', weight: '232.0', group: '3', period: '7', melting: '1750', boiling: '4788', density: '11.72', description: 'الثوريوم هو فلز أكتينيد مشع فضي. يستخدم كمصدر للطاقة النووية وفي صناعة المصابيح.' },
+            { number: 91, symbol: 'Pa', name: 'بروتكتينيوم', category: 'actinide', weight: '231.0', group: '3', period: '7', melting: '1568', boiling: '4027', density: '15.37', description: 'البروتكتينيوم هو فلز أكتينيد مشع فضي. يستخدم في الأبحاث العلمية.' },
+            { number: 92, symbol: 'U', name: 'يورانيوم', category: 'actinide', weight: '238.0', group: '3', period: '7', melting: '1135', boiling: '4131', density: '19.05', description: 'اليورانيوم هو فلز أكتينيد مشع فضي. يستخدم كوقود للمفاعلات النووية وفي الأسلحة النووية.' },
+            { number: 93, symbol: 'Np', name: 'نبتونيوم', category: 'actinide', weight: '237', group: '3', period: '7', melting: '644', boiling: '3902', density: '20.45', description: 'النبتونيوم هو فلز أكتينيد مشع فضي. يستخدم في الأبحاث العلمية وفي أجهزة الكشف عن الدخان.' },
+            { number: 94, symbol: 'Pu', name: 'بلوتونيوم', category: 'actinide', weight: '244', group: '3', period: '7', melting: '640', boiling: '3228', density: '19.86', description: 'البلوتونيوم هو فلز أكتينيد مشع فضي أبيض. يستخدم في الأسلحة النووية وفي مولدات الحرارة النووية.' },
+            { number: 95, symbol: 'Am', name: 'أمريسيوم', category: 'actinide', weight: '243', group: '3', period: '7', melting: '1176', boiling: '2607', density: '12', description: 'الأمريسيوم هو فلز أكتينيد مشع فضي أبيض. يستخدم في أجهزة الكشف عن الدخان وفي الأبحاث العلمية.' },
+            { number: 96, symbol: 'Cm', name: 'كوريوم', category: 'actinide', weight: '247', group: '3', period: '7', melting: '1345', boiling: '3110', density: '13.51', description: 'الكوريوم هو فلز أكتينيد مشع فضي. يستخدم في الأبحاث العلمية وفي الطب النووي.' },
+            { number: 97, symbol: 'Bk', name: 'بيركيليوم', category: 'actinide', weight: '247', group: '3', period: '7', melting: '1050', boiling: '2900', density: '14.78', description: 'البيركيليوم هو فلز أكتينيد مشع فضي. يستخدم في الأبحاث العلمية.' },
+            { number: 98, symbol: 'Cf', name: 'كاليفورنيوم', category: 'actinide', weight: '251', group: '3', period: '7', melting: '900', boiling: '1470', density: '15.1', description: 'الكاليفورنيوم هو فلز أكتينيد مشع. يستخدم في علاج السرطان وفي الأبحاث العلمية.' },
+            { number: 99, symbol: 'Es', name: 'أينشتاينيوم', category: 'actinide', weight: '252', group: '3', period: '7', melting: '860', boiling: '996', density: '8.84', description: 'الأينشتاينيوم هو فلز أكتينيد مشع فضي. يستخدم في الأبحاث العلمية.' },
+            { number: 100, symbol: 'Fm', name: 'فرميوم', category: 'actinide', weight: '257', group: '3', period: '7', melting: '1527', boiling: '0', density: '0', description: 'الفرميوم هو فلز أكتينيد مشع. يستخدم في الأبحاث العلمية.' },
+            { number: 101, symbol: 'Md', name: 'مندليفيوم', category: 'actinide', weight: '258', group: '3', period: '7', melting: '827', boiling: '0', density: '0', description: 'المندليفيوم هو فلز أكتينيد مشع. يستخدم في الأبحاث العلمية.' },
+            { number: 102, symbol: 'No', name: 'نوبليوم', category: 'actinide', weight: '259', group: '3', period: '7', melting: '827', boiling: '0', density: '0', description: 'النوبليوم هو فلز أكتينيد مشع. يستخدم في الأبحاث العلمية.' },
+            { number: 103, symbol: 'Lr', name: 'لاورنسيوم', category: 'actinide', weight: '266', group: '3', period: '7', melting: '1627', boiling: '0', density: '0', description: 'اللاورنسيوم هو فلز أكتينيد مشع. يستخدم في الأبحاث العلمية.' },
+            { number: 104, symbol: 'Rf', name: 'ذرفرديوم', category: 'transition', weight: '267', group: '4', period: '7', melting: '0', boiling: '0', density: '0', description: 'الذرفرديوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 105, symbol: 'Db', name: 'دوبنيوم', category: 'transition', weight: '268', group: '5', period: '7', melting: '0', boiling: '0', density: '0', description: 'الدوبنيوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 106, symbol: 'Sg', name: 'سيبورغيوم', category: 'transition', weight: '271', group: '6', period: '7', melting: '0', boiling: '0', density: '0', description: 'السيبورغيوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 107, symbol: 'Bh', name: 'بوريوم', category: 'transition', weight: '272', group: '7', period: '7', melting: '0', boiling: '0', density: '0', description: 'البوريوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 108, symbol: 'Hs', name: 'هاسيوم', category: 'transition', weight: '270', group: '8', period: '7', melting: '0', boiling: '0', density: '0', description: 'الهاسيوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 109, symbol: 'Mt', name: 'مايتنيريوم', category: 'transition', weight: '276', group: '9', period: '7', melting: '0', boiling: '0', density: '0', description: 'المايتنيريوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 110, symbol: 'Ds', name: 'دارمشتادتيوم', category: 'transition', weight: '281', group: '10', period: '7', melting: '0', boiling: '0', density: '0', description: 'الدارمشتادتيوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 111, symbol: 'Rg', name: 'رينتجينيوم', category: 'transition', weight: '282', group: '11', period: '7', melting: '0', boiling: '0', density: '0', description: 'الرينتجينيوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 112, symbol: 'Cn', name: 'كوبرنيسيوم', category: 'transition', weight: '285', group: '12', period: '7', melting: '0', boiling: '0', density: '0', description: 'الكوبرنيسيوم هو فلز انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 113, symbol: 'Nh', name: 'نيهونيوم', category: 'post-transition', weight: '286', group: '13', period: '7', melting: '0', boiling: '0', density: '0', description: 'النيهونيوم هو فلز ما بعد انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 114, symbol: 'Fl', name: 'فلروفيوم', category: 'post-transition', weight: '289', group: '14', period: '7', melting: '0', boiling: '0', density: '0', description: 'الفلروفيوم هو فلز ما بعد انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 115, symbol: 'Mc', name: 'موسكوفيوم', category: 'post-transition', weight: '290', group: '15', period: '7', melting: '0', boiling: '0', density: '0', description: 'الموسكوفيوم هو فلز ما بعد انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 116, symbol: 'Lv', name: 'ليفرموريوم', category: 'post-transition', weight: '293', group: '16', period: '7', melting: '0', boiling: '0', density: '0', description: 'الليفرموريوم هو فلز ما بعد انتقالي مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 117, symbol: 'Ts', name: 'تينيسين', category: 'halogen', weight: '294', group: '17', period: '7', melting: '0', boiling: '0', density: '0', description: 'التينيسين هو هالوجين مشع صناعي. يستخدم في الأبحاث العلمية.' },
+            { number: 118, symbol: 'Og', name: 'أوغانيسون', category: 'noble', weight: '294', group: '18', period: '7', melting: '0', boiling: '0', density: '0', description: 'الأوغانيسون هو غاز نبيل مشع صناعي. يستخدم في الأبحاث العلمية.' }
+        ];
+
+        // دالة لعرض العناصر
+        function displayElements(elementsToShow) {
+            const container = document.getElementById('elementsContainer');
+            const noResults = document.getElementById('noResults');
+            
+            container.innerHTML = '';
+            
+            if (elementsToShow.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            elementsToShow.forEach(element => {
+                const elementCard = document.createElement('div');
+                elementCard.className = 'col-md-3 col-sm-4 col-6';
+                
+                const categoryClass = `category-${element.category}`;
+                const categoryName = getCategoryName(element.category);
+                
+                elementCard.innerHTML = `
+                    <div class="element-card" onclick="showElementDetails(${element.number})">
+                        <div id="image-${element.number}" class="element-image">
+                            <div class="loading-spinner">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">جاري التحميل...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="element-number">#${element.number}</div>
+                        <div class="element-symbol">${element.symbol}</div>
+                        <div class="element-name">${element.name}</div>
+                        <span class="element-category ${categoryClass}">${categoryName}</span>
+                    </div>
+                `;
+                
+                container.appendChild(elementCard);
+                
+                // تحميل صورة العنصر
+                loadElementImage(element.number, element.symbol);
+            });
+        }
+
+        // دالة لتحميل صورة العنصر
+        function loadElementImage(elementNumber, elementSymbol) {
+            const imageContainer = document.getElementById(`image-${elementNumber}`);
+            
+            // محاولة تحميل الصورة من ويكيميديا كومنز
+            fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${elementSymbol}&prop=pageimages&format=json&pithumbsize=300&origin=*`)
+                .then(response => response.json())
+                .then(data => {
+                    const pages = data.query.pages;
+                    const pageId = Object.keys(pages)[0];
+                    
+                    if (pages[pageId].thumbnail) {
+                        const imageUrl = pages[pageId].thumbnail.source;
+                        imageContainer.innerHTML = `<img src="${imageUrl}" alt="${elementSymbol}" class="element-image">`;
+                    } else {
+                        // إذا لم تكن هناك صورة في ويكيميديا، استخدم صورة من Google Images
+                        imageContainer.innerHTML = `<img src="https://source.unsplash.com/300x200/?${elementSymbol},chemistry" alt="${elementSymbol}" class="element-image">`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading image:', error);
+                    // في حالة وجود خطأ، استخدم صورة من Google Images
+                    imageContainer.innerHTML = `<img src="https://source.unsplash.com/300x200/?${elementSymbol},chemistry" alt="${elementSymbol}" class="element-image">`;
+                });
+        }
+
+        // دالة لتحميل صورة العنصر في النافذة المنبثقة
+        function loadModalElementImage(elementSymbol) {
+            const modalImageContainer = document.getElementById('modalImageContainer');
+            
+            // محاولة تحميل الصورة من ويكيميديا كومنز
+            fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${elementSymbol}&prop=pageimages&format=json&pithumbsize=600&origin=*`)
+                .then(response => response.json())
+                .then(data => {
+                    const pages = data.query.pages;
+                    const pageId = Object.keys(pages)[0];
+                    
+                    if (pages[pageId].thumbnail) {
+                        const imageUrl = pages[pageId].thumbnail.source;
+                        modalImageContainer.innerHTML = `<img src="${imageUrl}" alt="${elementSymbol}" class="element-image">`;
+                    } else {
+                        // إذا لم تكن هناك صورة في ويكيميديا، استخدم صورة من Google Images
+                        modalImageContainer.innerHTML = `<img src="https://source.unsplash.com/600x400/?${elementSymbol},chemistry" alt="${elementSymbol}" class="element-image">`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading modal image:', error);
+                    // في حالة وجود خطأ، استخدم صورة من Google Images
+                    modalImageContainer.innerHTML = `<img src="https://source.unsplash.com/600x400/?${elementSymbol},chemistry" alt="${elementSymbol}" class="element-image">`;
+                });
+        }
+
+        // دالة للحصول على اسم التصنيف بالعربية
+        function getCategoryName(category) {
+            const categories = {
+                'alkali': 'فلز قلوي',
+                'alkaline': 'فلز قلالي ترابي',
+                'transition': 'فلز انتقالي',
+                'post-transition': 'فلز ما بعد انتقالي',
+                'metalloid': 'شبه فلز',
+                'nonmetal': 'لا فلز',
+                'halogen': 'هالوجين',
+                'noble': 'غاز نبيل',
+                'lanthanide': 'لانثانيد',
+                'actinide': 'أكتينيد'
+            };
+            
+            return categories[category] || category;
+        }
+
+        // دالة لعرض تفاصيل العنصر
+        function showElementDetails(elementNumber) {
+            const element = elements.find(el => el.number === elementNumber);
+            
+            if (!element) return;
+            
+            // تحميل صورة العنصر في النافذة المنبثقة
+            loadModalElementImage(element.symbol);
+            
+            document.getElementById('modalElementName').textContent = element.name;
+            document.getElementById('modalElementSymbol').textContent = element.symbol;
+            document.getElementById('modalElementNumber').textContent = element.number;
+            document.getElementById('modalElementWeight').textContent = element.weight;
+            document.getElementById('modalElementGroup').textContent = element.group;
+            document.getElementById('modalElementPeriod').textContent = element.period;
+            document.getElementById('modalElementCategory').textContent = getCategoryName(element.category);
+            document.getElementById('modalElementMelting').textContent = element.melting + '°C';
+            document.getElementById('modalElementBoiling').textContent = element.boiling + '°C';
+            document.getElementById('modalElementDensity').textContent = element.density + ' g/cm³';
+            document.getElementById('modalElementDescription').textContent = element.description;
+            
+            const modal = new bootstrap.Modal(document.getElementById('elementModal'));
+            modal.show();
+        }
+
+        // دالة للبحث عن العناصر
+        function searchElements() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
+            
+            let filteredElements = elements;
+            
+            // تطبيق فلتر التصنيف
+            if (activeCategory !== 'all') {
+                filteredElements = filteredElements.filter(element => element.category === activeCategory);
+            }
+            
+            // تطبيق فلتر البحث
+            if (searchTerm) {
+                filteredElements = filteredElements.filter(element => 
+                    element.name.toLowerCase().includes(searchTerm) || 
+                    element.symbol.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            displayElements(filteredElements);
+        }
+
+        // دالة لتغيير الفلتر
+        function setFilter(category) {
+            // تحديث الأزرار النشطة
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            // تطبيق البحث والفلتر
+            searchElements();
+        }
+
+        // إضافة مستمعي الأحداث
+        document.addEventListener('DOMContentLoaded', () => {
+            // عرض جميع العناصر عند التحميل
+            displayElements(elements);
+            
+            // مستمع البحث
+            document.getElementById('searchInput').addEventListener('input', searchElements);
+            
+            // مستمع أيقونة البحث
+            document.getElementById('searchIcon').addEventListener('click', searchElements);
+            
+            // مستمعي أزرار الفلتر
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setFilter(btn.dataset.category);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
